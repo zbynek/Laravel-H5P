@@ -56,7 +56,7 @@ class AjaxController extends Controller
     {
         $h5p = App::make('LaravelH5p');
         $editor = $h5p::$h5peditor;
-        $editor->ajax->action(H5PEditorEndpoints::LIBRARY_INSTALL, $request->get('_token'), $request->get('machineName'));
+        $editor->ajax->action(H5PEditorEndpoints::LIBRARY_INSTALL, $request->get('_token'), $request->get('id'));
     }
 
     public function libraryUpload(Request $request)

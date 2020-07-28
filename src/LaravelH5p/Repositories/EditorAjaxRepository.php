@@ -52,13 +52,13 @@ class EditorAjaxRepository implements H5PEditorAjaxInterface
        GROUP BY hl.name';
 
         $minor_versions_sql = "SELECT hl2.name,
-                 hl2.majorVersion,
-                 MAX(hl2.minorVersion) AS minorVersion
+                 hl1.majorVersion,
+                 MAX(hl2.minor_version) AS minorVersion
             FROM ({$major_versions_sql}) hl1
             JOIN h5p_libraries hl2
               ON hl1.name = hl2.name
-             AND hl1.majorVersion = hl2.majorVersion
-        GROUP BY hl2.name, hl2.majorVersion";
+             AND hl1.majorVersion = hl2.major_version
+        GROUP BY hl2.name, hl2.major_version";
 
         return DB::select("SELECT hl4.id,
                 hl4.name AS machine_name,
@@ -70,9 +70,9 @@ class EditorAjaxRepository implements H5PEditorAjaxInterface
            FROM ({$minor_versions_sql}) hl3
            JOIN h5p_libraries hl4
              ON hl3.name = hl4.name
-            AND hl3.major_version = hl4.major_version
-            AND hl3.minor_version = hl4.minor_version
-       GROUP BY hl4.name, hl4.major_version, hl4.minor_version");
+            AND hl3.majorVersion = hl4.major_version
+            AND hl3.minorVersion = hl4.minor_version
+       GROUP BY hl4.id, hl4.name, hl4.major_version, hl4.minor_version");
     }
 
     public function getContentTypeCache($machineName = null)
@@ -81,31 +81,46 @@ class EditorAjaxRepository implements H5PEditorAjaxInterface
         if ($machineName) {
             return $where->where('machine_name', $machineName)->pluck('id', 'is_recommended');
         } else {
-            return $where->where('machine_name', $machineName)->get();
+            return $this->cleanup($where->get());
         }
+    }
+
+    public function cleanup($data) {
+        $clean = [];
+        foreach($data as $item) {
+           $clean[] = json_decode(json_encode($item));
+	}
+        return $clean;
     }
 
     public function getLatestLibraryVersions()
     {
         $recently_used = [];
-        $result = DB::table('h5p_events')
+        /*$result = DB::table('h5p_event_logs')
             ->select([
                 'library_name',
-                'max(created_at) AS max_created_at',
+                DB::raw('max(created_at) AS max_created_at'),
             ])
-            ->where('type', 'content')
+            ->where('type', 'library')
             ->where('sub_type', 'create')
             ->where('user_id', Auth::id())
             ->groupBy('library_name')
             ->orderBy('max_created_at', 'DESC')
+            ->get();*/
+       $result = DB::table('h5p_libraries')
+            ->select([
+                '*',
+                'name as machine_name',
+'major_version as majorVersion',
+'minor_version as minorVersion',
+                //DB::raw('max(created_at) AS max_created_at'),
+            ])
+            ->orderBy('created_at', 'DESC')
             ->get();
-
         foreach ($result as $row) {
-            $recently_used[] = $row->library_name;
+            $recently_used[] = $row;//->library_name;
         }
 
-        dd($recently_used);
-        exit;
 
         return $recently_used;
     }

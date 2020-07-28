@@ -118,7 +118,10 @@ class LaravelH5pStorage implements H5PFileStorage
         $temp = "{$this->path}/temp";
         self::dirReady($temp);
 
-        return "{$temp}/".uniqid('h5p-');
+        $ret= "{$temp}/".uniqid('h5p-');
+      //  print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+//die();
+        return $ret;
     }
 
     /**
@@ -341,7 +344,6 @@ class LaravelH5pStorage implements H5PFileStorage
 
         // Add filename to path
         $path .= '/'.$file->getName();
-
         $fileData = $file->getData();
         if ($fileData) {
             file_put_contents($path, $fileData);
@@ -591,6 +593,8 @@ class LaravelH5pStorage implements H5PFileStorage
      */
     public function saveFileFromZip($path, $file, $stream)
     {
+        self::dirReady("$path/".dirname($file));
+        file_put_contents("$path/$file", stream_get_contents($stream));
         return true;
     }
 }

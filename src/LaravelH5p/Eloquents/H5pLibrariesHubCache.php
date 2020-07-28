@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class H5pLibrariesHubCache extends Model
 {
+    protected $table = 'h5p_libraries_hub_cache';
     protected $primaryKey = 'id';
     protected $fillable = [
         'machine_name',

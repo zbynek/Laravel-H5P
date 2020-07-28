@@ -17,6 +17,7 @@ use DB;
 use Djoudi\LaravelH5p\Eloquents\H5pLibrary;
 use Djoudi\LaravelH5p\Eloquents\H5pTmpfile;
 use H5peditorStorage;
+use H5PCore;
 
 /**
  * Description of H5pStorage.
@@ -33,6 +34,7 @@ class EditorStorage implements H5peditorStorage
 
     public function getAvailableLanguages($machineName, $majorVersion, $minorVersion)
     {
+      return array();
     }
 
     public function getLanguage($machineName, $majorVersion, $minorVersion, $language)
@@ -162,7 +164,7 @@ class EditorStorage implements H5peditorStorage
     {
         if (is_dir($filePath)) {
             H5PCore::deleteFileTree($filePath);
-        } else {
+        } else if(file_exists($filePath)) {
             unlink($filePath);
         }
     }

@@ -14,6 +14,7 @@ namespace Djoudi\LaravelH5p\Repositories;
 
 use Carbon\Carbon;
 use DB;
+use DateTime;
 use Djoudi\LaravelH5p\Eloquents\H5pContent;
 use Djoudi\LaravelH5p\Eloquents\H5pContentsLibrary;
 use Djoudi\LaravelH5p\Eloquents\H5pContentsUserData;
@@ -23,7 +24,9 @@ use Djoudi\LaravelH5p\Eloquents\H5pResult;
 use Djoudi\LaravelH5p\Events\H5pEvent;
 use Djoudi\LaravelH5p\Helpers\H5pHelper;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use H5PFrameworkInterface;
+use H5PPermission;
 use Illuminate\Support\Facades\App;
 
 class LaravelH5pRepository implements H5PFrameworkInterface
@@ -41,6 +44,7 @@ class LaravelH5pRepository implements H5PFrameworkInterface
 
     public function loadAddons()
     {
+return [];
     }
 
     public function getLibraryConfig($libraries = null)
@@ -772,8 +776,8 @@ class LaravelH5pRepository implements H5PFrameworkInterface
         @set_time_limit(0);
         $options = [
             'timeout'  => !empty($blocking) ? 30 : 0.01,
-            'stream'   => !empty($stream),
-            'filename' => !empty($stream) ? $stream : false,
+           // 'stream'   => !empty($stream),
+           // 'filename' => !empty($stream) ? $stream : false,
         ];
 
         $client = new Client();
@@ -781,14 +785,16 @@ class LaravelH5pRepository implements H5PFrameworkInterface
         try {
             if ($data !== null) {
                 // Post
-                $options['body'] = $data;
+$options = $data;
+                //$options['body'] = $data;
                 $response = $client->request('POST', $url, ['form_params' => $options]);
             } else {
                 // Get
                 if (empty($options['filename'])) {
                     // Support redirects
                     //                $response = wp_remote_get($url);
-                    $response = $client->request('GET', $url);
+                    $response = $client->request('GET', $url, $options);
+                    file_put_contents($stream, $response->getBody());
                 } else {
                     // Use safe when downloading files
                     //                $response = wp_safe_remote_get($url, $options);
@@ -1010,7 +1016,7 @@ class LaravelH5pRepository implements H5PFrameworkInterface
                 tutorial,
                 keywords,
                 categories,
-                owner) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
+                owner) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
                 $ct->id,
                 $ct->version->major,
                 $ct->version->minor,

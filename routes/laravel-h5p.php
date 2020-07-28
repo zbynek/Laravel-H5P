@@ -19,7 +19,7 @@ Route::group(['middleware' => ['web']], function () {
         Route::get('ajax', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController')->name('h5p.ajax');
         Route::get('ajax/libraries', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@libraries')->name('h5p.ajax.libraries');
         Route::get('ajax/single-libraries', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@singleLibrary')->name('h5p.ajax.single-libraries');
-        Route::post('ajax/content-type-cache', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@contentTypeCache')->name('h5p.ajax.content-type-cache');
+        Route::get('ajax/content-type-cache', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@contentTypeCache')->name('h5p.ajax.content-type-cache');
         Route::post('ajax/library-install', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@libraryInstall')->name('h5p.ajax.library-install');
         Route::post('ajax/library-upload', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@libraryUpload')->name('h5p.ajax.library-upload');
         Route::post('ajax/rebuild-cache', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@rebuildCache')->name('h5p.ajax.rebuild-cache');
